@@ -1,41 +1,41 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <title>Rank Checker</title>
+  <meta charset="UTF-8" />
+  <title>랭크 등록기</title>
   <style>
-    body { font-family: Arial, sans-serif; padding: 2rem; background: #f5f5f5; }
-    input, button { padding: 0.5rem; font-size: 1rem; }
-    #result { margin-top: 1rem; font-weight: bold; }
+    body { font-family: Arial; padding: 2rem; text-align: center; }
+    input, button { font-size: 18px; padding: 0.5rem; }
+    #result { margin-top: 20px; font-weight: bold; }
   </style>
 </head>
 <body>
-  <h1>🏆 내 점수 랭크 보기</h1>
-  <input type="number" id="valueInput" placeholder="점수를 입력하세요" />
-  <button onclick="submitScore()">제출</button>
+  <h1>값 입력하고 랭크 보기</h1>
+  <input type="number" id="val" placeholder="숫자 입력" />
+  <button onclick="submit()">제출</button>
   <div id="result"></div>
 
   <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwtwLep2ZTOsQQZXMeN-qtiPEV5AJsyqOuB8pvt1iz-gHxSXzYKbNF7XmaY3ph710rxXQ/exec";
+    const API_URL = "https://script.google.com/macros/s/AKfycbwtwLep2ZTOsQQZXMeN-qtiPEV5AJsyqOuB8pvt1iz-gHxSXzYKbNF7XmaY3ph710rxXQ/exec";
 
-    async function submitScore() {
-      const value = document.getElementById("valueInput").value;
-      if (!value) return alert("값을 입력하세요");
-
-      const formData = new FormData();
-      formData.append("value", value);
-
-      try {
-        const res = await fetch(SCRIPT_URL, {
-          method: "POST",
-          body: formData
-        });
-
-        const data = await res.json();
-        document.getElementById("result").innerText = `당신의 랭크는 ${data.rank}등 입니다.`;
-      } catch (err) {
-        document.getElementById("result").innerText = "오류 발생: " + err;
-      }
+    function submit() {
+      const value = document.getElementById("val").value;
+      fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: "value=" + encodeURIComponent(value)
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.rank) {
+          document.getElementById("result").textContent = `${data.value} → 현재 랭크: ${data.rank}위`;
+        } else {
+          document.getElementById("result").textContent = "에러: " + (data.error || "알 수 없음");
+        }
+      })
+      .catch(err => {
+        document.getElementById("result").textContent = "통신 실패";
+      });
     }
   </script>
 </body>
